@@ -125,35 +125,70 @@ namespace LinchpinBackend.Data.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("CleaningCategory")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<DateOnly>("CleaningDate")
+                        .HasColumnType("date");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int?>("CreatedByUserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Data")
+                    b.Property<string>("Findings")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("HasDescription")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("HasIntervention")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Intervention")
                         .HasColumnType("json");
 
-                    b.Property<DateOnly?>("ReportDate")
-                        .HasColumnType("date");
+                    b.Property<string>("SimulatorCategory")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("varchar(10)");
+
+                    b.Property<string>("SimulatorCode")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<int?>("SimulatorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SimulatorName")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserName")
+                        .IsRequired()
                         .HasMaxLength(120)
                         .HasColumnType("varchar(120)");
 
-                    b.Property<string>("UserRole")
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedByUserId");
+                    b.HasIndex("CleaningDate");
 
-                    b.HasIndex("ReportDate");
+                    b.HasIndex("SimulatorCategory");
+
+                    b.HasIndex("SimulatorCode");
+
+                    b.HasIndex("SimulatorId");
+
+                    b.HasIndex("UserId");
 
                     b.HasIndex("UserName");
 
@@ -446,6 +481,23 @@ namespace LinchpinBackend.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("LessonGroup");
+                });
+
+            modelBuilder.Entity("LinchpinBackend.Models.Reports.CleaningReport", b =>
+                {
+                    b.HasOne("LinchpinBackend.Models.Simulator", "Simulator")
+                        .WithMany()
+                        .HasForeignKey("SimulatorId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("LinchpinBackend.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Simulator");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("LinchpinBackend.Models.Simulator", b =>

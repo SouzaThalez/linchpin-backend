@@ -108,7 +108,7 @@ public class DbSeeder(AppDbContext db, IConfiguration config, IWebHostEnvironmen
 
         AddReports<LessonReport>(root, "LessonReports");
         AddReports<ScenarioReport>(root, "ScenarioReports");
-        AddReports<CleaningReport>(root, "CleaningReports");
+        AddCleaningReports(root);
         AddReports<MaintenanceReport>(root, "manitanceReports");
 
         await db.SaveChangesAsync();
@@ -148,6 +148,43 @@ public class DbSeeder(AppDbContext db, IConfiguration config, IWebHostEnvironmen
             });
         }
     }
+
+    /// <summary>
+    /// No db.json antigo as limpezas vinham agrupadas em "OS" (osCode/osTag + lista "simulator"),
+    /// às vezes aninhadas. Aqui cada limpeza vira um registro próprio.
+    /// </summary>
+    private void AddCleaningReports(JsonObject root)
+    {
+        foreach (var c in Items(root, "CleaningReports").SelectMany(FlattenCleanings))
+        {
+            var name = Str(c, "simulatorName") ?? "";
+            var userName = (c["user"] as JsonObject) is { } u ? Str(u, "name") ?? "" : "";
+            var simulator = db.Simulators.Local.FirstOrDefault(s => s.Name == name);
+            var date = ParseDate(Str(c, "date"));
+            if (date is null) continue;
+
+            db.CleaningReports.Add(new CleaningReport
+            {
+                Simulator = simulator,
+                SimulatorName = name,
+                SimulatorCode = Str(c, "simulatorCode") ?? "",
+                SimulatorCategory = simulator?.Category ?? Str(c, "simulatorCategory") ?? SimulatorCategories.High,
+                CleaningCategory = Str(c, "cleaningCategory") ?? CleaningCategories.Primary,
+                CleaningDate = date.Value,
+                Findings = Str(c, "findings") ?? "",
+                HasDescription = c["hasDescription"] is JsonValue d && d.GetValueKind() == JsonValueKind.True,
+                HasIntervention = c["hasIntervention"] is JsonValue i && i.GetValueKind() == JsonValueKind.True,
+                Intervention = (c["intervention"] as JsonObject)?.ToJsonString(),
+                User = db.Users.Local.FirstOrDefault(x => x.Name == userName),
+                UserName = userName
+            });
+        }
+    }
+
+    private static IEnumerable<JsonObject> FlattenCleanings(JsonObject node) =>
+        node["simulator"] is JsonArray children
+            ? children.OfType<JsonObject>().SelectMany(FlattenCleanings)
+            : [node];
 
     private static Simulator ToSimulator(JsonObject s, string category)
     {

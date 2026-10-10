@@ -9,7 +9,7 @@ namespace LinchpinBackend.Controllers;
 
 /// <summary>
 /// Endpoints comuns dos relatórios. Filtros via query string sobre os campos do relatório,
-/// ex.: GET /api/cleaning-reports?hasDescription=true&amp;user.name=Thales
+/// ex.: GET /api/lesson-reports?lessonDescription=true&amp;user.name=Thales
 /// </summary>
 [ApiController]
 [Authorize]
@@ -54,9 +54,6 @@ public class LessonReportsController(ReportService<LessonReport> reports) : Repo
 
 [Route("api/scenario-reports")]
 public class ScenarioReportsController(ReportService<ScenarioReport> reports) : ReportsController<ScenarioReport>(reports);
-
-[Route("api/cleaning-reports")]
-public class CleaningReportsController(ReportService<CleaningReport> reports) : ReportsController<CleaningReport>(reports);
 
 [Route("api/maintenance-reports")]
 public class MaintenanceReportsController(ReportService<MaintenanceReport> reports) : ReportsController<MaintenanceReport>(reports);

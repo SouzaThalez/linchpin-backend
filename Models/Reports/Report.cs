@@ -19,5 +19,4 @@ public abstract class Report
 
 public class LessonReport : Report;
 public class ScenarioReport : Report;
-public class CleaningReport : Report;
 public class MaintenanceReport : Report;

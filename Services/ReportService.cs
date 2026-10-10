@@ -10,7 +10,7 @@ using MySqlConnector;
 namespace LinchpinBackend.Services;
 
 /// <summary>
-/// Regras comuns a todos os relatórios (aula, cenário, limpeza e manutenção).
+/// Regras comuns a todos os relatórios (aula, cenário e manutenção).
 /// O formulário é salvo como documento JSON e devolvido com o "id" do banco.
 /// </summary>
 public partial class ReportService<T>(AppDbContext db, ICurrentUser currentUser) where T : Report, new()

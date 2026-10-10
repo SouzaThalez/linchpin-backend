@@ -100,8 +100,29 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         ConfigureReport<LessonReport>(model, "lesson_reports");
         ConfigureReport<ScenarioReport>(model, "scenario_reports");
-        ConfigureReport<CleaningReport>(model, "cleaning_reports");
         ConfigureReport<MaintenanceReport>(model, "maintenance_reports");
+
+        model.Entity<CleaningReport>(e =>
+        {
+            e.ToTable("cleaning_reports");
+            e.Property(x => x.SimulatorName).HasMaxLength(120).IsRequired();
+            e.Property(x => x.SimulatorCode).HasMaxLength(40).IsRequired();
+            e.Property(x => x.SimulatorCategory).HasMaxLength(10).IsRequired();
+            e.Property(x => x.CleaningCategory).HasMaxLength(20).IsRequired();
+            e.Property(x => x.Findings).HasColumnType("text").IsRequired();
+            e.Property(x => x.Intervention).HasColumnType("json");
+            e.Property(x => x.UserName).HasMaxLength(120).IsRequired();
+            e.HasIndex(x => x.SimulatorCategory);
+            e.HasIndex(x => x.SimulatorCode);
+            e.HasIndex(x => x.CleaningDate);
+            e.HasIndex(x => x.UserName);
+            e.HasOne(x => x.Simulator).WithMany()
+                .HasForeignKey(x => x.SimulatorId)
+                .OnDelete(DeleteBehavior.SetNull);
+            e.HasOne(x => x.User).WithMany()
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
     }
 
     private static void ConfigureReport<T>(ModelBuilder model, string table) where T : Models.Reports.Report

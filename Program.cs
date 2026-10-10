@@ -66,6 +66,7 @@ builder.Services.AddScoped<SimulatorClassService>();
 builder.Services.AddScoped<CourseService>();
 builder.Services.AddScoped<LessonGroupService>();
 builder.Services.AddScoped(typeof(ReportService<>));
+builder.Services.AddScoped<CleaningReportService>();
 builder.Services.AddScoped<DbSeeder>();
 
 var app = builder.Build();
