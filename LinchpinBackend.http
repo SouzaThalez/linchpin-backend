@@ -1,0 +1,29 @@
+@host = http://localhost:5080/api
+
+### Login (copie o "token" da resposta para a variável abaixo)
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+  "login": "thales.carvalho",
+  "password": "SUA_SENHA"
+}
+
+###
+@token = COLE_O_TOKEN_AQUI
+
+### Usuário logado
+GET {{host}}/auth/me
+Authorization: Bearer {{token}}
+
+### Analistas
+GET {{host}}/users?role=analista
+Authorization: Bearer {{token}}
+
+### Simuladores de alta fidelidade
+GET {{host}}/simulators?category=alta
+Authorization: Bearer {{token}}
+
+### Relatórios de limpeza com descrição de um usuário
+GET {{host}}/cleaning-reports?hasDescription=true&user.name=Thales
+Authorization: Bearer {{token}}
